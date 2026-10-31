@@ -1,0 +1,11 @@
+[package]
+name = "riag-rust-example"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+riag = { path = ".." }
+arrow = { version = "55", optional = true, default-features = false, features = [] }
+
+[features]
+arrow = ["riag/arrow", "dep:arrow"]
