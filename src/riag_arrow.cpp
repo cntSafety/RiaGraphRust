@@ -7,13 +7,24 @@
 namespace riag {
 namespace main {
 
+// Mirror of the engine's src/include/main/query_result/arrow_query_result.h,
+// which riag.hpp does not export. getCSRArrowArrays() returns CSRArrowArrays
+// by value into storage this file allocates, so every data member below must
+// match the engine's declaration exactly, in order and type: a missing member
+// makes the engine write past the end of that storage (it crashed
+// QueryResult::csr() once CSRArrowArrays gained sortedByDest). Re-check this
+// against the engine header whenever that header changes.
 class ArrowQueryResult : public QueryResult {
 public:
     struct CSRMetadata {
         std::vector<int64_t> indptr;
         std::vector<int64_t> indices;
         std::vector<int64_t> edgeIDs;
+        std::vector<int64_t> srcRows;
+        std::vector<int64_t> counts;
         bool hasEdgeIDs = false;
+        bool sortedByDest = false;
+        int64_t numSourceRows = 0;
     };
 
     struct CSRArrowArray {
@@ -53,6 +64,7 @@ public:
         CSRArrowArray indptr;
         CSRArrowArray indices;
         std::optional<CSRArrowArray> edgeIDs;
+        bool sortedByDest = false;
     };
 
     CSRArrowArrays getCSRArrowArrays() const;
